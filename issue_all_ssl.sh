@@ -34,44 +34,37 @@ $COMPOSE_CMD up -d nginx_gateway
 sleep 3 # Wait for nginx to initialize
 
 # 3. Issue cert for HashImpact
-if [ ! -f "/etc/letsencrypt/live/hashimpact.io/fullchain.pem" ]; then
-    echo "--> Requesting certificate for hashimpact.io and api.hashimpact.io..."
-    $COMPOSE_CMD --profile certbot run --rm certbot certonly \
-      --webroot -w /var/www/certbot \
-      -d hashimpact.io \
-      -d api.hashimpact.io \
-      --email "${EMAIL}" \
-      --agree-tos \
-      --no-eff-email \
-      --non-interactive
-else
-    echo "--> Certificate for HashImpact already exists. Skipping."
-fi
+echo "--> Requesting certificate for hashimpact.io and api.hashimpact.io..."
+$COMPOSE_CMD --profile certbot run --rm certbot certonly \
+  --webroot -w /var/www/certbot \
+  -d hashimpact.io \
+  -d api.hashimpact.io \
+  --email "${EMAIL}" \
+  --agree-tos \
+  --no-eff-email \
+  --non-interactive || echo "⚠️ HashImpact SSL issuance failed, skipping..."
 
 # 4. Issue cert for Tools
-if [ ! -f "/etc/letsencrypt/live/tools.hashtax.io/fullchain.pem" ]; then
-    $COMPOSE_CMD --profile certbot run --rm certbot certonly \
-      --webroot -w /var/www/certbot \
-      -d tools.hashtax.io \
-      -d tools-api.hashtax.io \
-      -d logs.hashtax.io \
-      --email "${EMAIL}" \
-      --agree-tos \
-      --no-eff-email \
-      --non-interactive
-else
-    echo "--> Certificate for Tools already exists. Skipping."
-fi
+echo "--> Requesting certificate for tools.hashtax.io, tools-api.hashtax.io and logs.hashtax.io..."
+$COMPOSE_CMD --profile certbot run --rm certbot certonly \
+  --webroot -w /var/www/certbot \
+  -d tools.hashtax.io \
+  -d tools-api.hashtax.io \
+  -d logs.hashtax.io \
+  --email "${EMAIL}" \
+  --agree-tos \
+  --no-eff-email \
+  --non-interactive \
+  --expand || echo "⚠️ Tools SSL issuance failed, skipping..."
 
 # 5. Activate SSL configs
 echo "--> Activating HTTPS configs..."
-# Only copy if the target cert actually exists now
-[ -f "/etc/letsencrypt/live/hashimpact.io/fullchain.pem" ] && cp -f conf.d/hashimpact.ssl.conf.disabled conf.d/hashimpact.conf
-[ -f "/etc/letsencrypt/live/tools.hashtax.io/fullchain.pem" ] && cp -f conf.d/tools.ssl.conf.disabled conf.d/tools.conf
+[ -f "/etc/letsencrypt/live/hashimpact.io/fullchain.pem" ] && cp -f conf.d/hashimpact.ssl.conf.disabled conf.d/hashimpact.conf || echo "Skipping HashImpact SSL activation"
+[ -f "/etc/letsencrypt/live/tools.hashtax.io/fullchain.pem" ] && cp -f conf.d/tools.ssl.conf.disabled conf.d/tools.conf || echo "Skipping Tools SSL activation"
 
 # 6. Reload Nginx
 echo "--> Reloading Nginx gateway..."
-$COMPOSE_CMD exec -T nginx_gateway nginx -s reload
+$COMPOSE_CMD exec -T nginx_gateway nginx -t && $COMPOSE_CMD exec -T nginx_gateway nginx -s reload
 
 echo "=================================================="
 echo " ✅ SSL setup/check complete!"
