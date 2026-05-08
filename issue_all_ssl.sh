@@ -24,36 +24,45 @@ docker compose up -d nginx_gateway
 sleep 3 # Wait for nginx to initialize
 
 # 3. Issue cert for HashImpact
-echo "--> Requesting certificate for hashimpact.io and api.hashimpact.io..."
-docker compose --profile certbot run --rm certbot certonly \
-  --webroot -w /var/www/certbot \
-  -d hashimpact.io \
-  -d api.hashimpact.io \
-  --email "${EMAIL}" \
-  --agree-tos \
-  --no-eff-email \
-  --non-interactive || { echo "❌ Failed to issue HashImpact certs"; exit 1; }
+if [ ! -f "/etc/letsencrypt/live/hashimpact.io/fullchain.pem" ]; then
+    echo "--> Requesting certificate for hashimpact.io and api.hashimpact.io..."
+    docker compose --profile certbot run --rm certbot certonly \
+      --webroot -w /var/www/certbot \
+      -d hashimpact.io \
+      -d api.hashimpact.io \
+      --email "${EMAIL}" \
+      --agree-tos \
+      --no-eff-email \
+      --non-interactive
+else
+    echo "--> Certificate for HashImpact already exists. Skipping."
+fi
 
 # 4. Issue cert for Tools
-echo "--> Requesting certificate for tools.hashtax.io and tools-api.hashtax.io..."
-docker compose --profile certbot run --rm certbot certonly \
-  --webroot -w /var/www/certbot \
-  -d tools.hashtax.io \
-  -d tools-api.hashtax.io \
-  --email "${EMAIL}" \
-  --agree-tos \
-  --no-eff-email \
-  --non-interactive || { echo "❌ Failed to issue Tools certs"; exit 1; }
+if [ ! -f "/etc/letsencrypt/live/tools.hashtax.io/fullchain.pem" ]; then
+    echo "--> Requesting certificate for tools.hashtax.io and tools-api.hashtax.io..."
+    docker compose --profile certbot run --rm certbot certonly \
+      --webroot -w /var/www/certbot \
+      -d tools.hashtax.io \
+      -d tools-api.hashtax.io \
+      --email "${EMAIL}" \
+      --agree-tos \
+      --no-eff-email \
+      --non-interactive
+else
+    echo "--> Certificate for Tools already exists. Skipping."
+fi
 
 # 5. Activate SSL configs
-echo "--> Certificates obtained! Activating HTTPS configs..."
-cp -f conf.d/hashimpact.ssl.conf.disabled conf.d/hashimpact.conf
-cp -f conf.d/tools.ssl.conf.disabled conf.d/tools.conf
+echo "--> Activating HTTPS configs..."
+# Only copy if the target cert actually exists now
+[ -f "/etc/letsencrypt/live/hashimpact.io/fullchain.pem" ] && cp -f conf.d/hashimpact.ssl.conf.disabled conf.d/hashimpact.conf
+[ -f "/etc/letsencrypt/live/tools.hashtax.io/fullchain.pem" ] && cp -f conf.d/tools.ssl.conf.disabled conf.d/tools.conf
 
 # 6. Reload Nginx
 echo "--> Reloading Nginx gateway..."
-docker compose restart nginx_gateway
+docker compose exec -T nginx_gateway nginx -s reload
 
 echo "=================================================="
-echo " ✅ SSL setup complete and HTTPS is active!       "
+echo " ✅ SSL setup/check complete!"
 echo "=================================================="
