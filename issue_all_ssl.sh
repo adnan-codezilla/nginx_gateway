@@ -3,6 +3,16 @@ set -euo pipefail
 
 EMAIL="${1:-hello@hashtax.io}"
 
+# Detect docker compose version
+if docker compose version >/dev/null 2>&1; then
+    COMPOSE_CMD="docker compose"
+elif docker-compose version >/dev/null 2>&1; then
+    COMPOSE_CMD="docker-compose"
+else
+    echo "❌ Error: Neither 'docker compose' nor 'docker-compose' found."
+    exit 1
+fi
+
 echo "=================================================="
 echo "    Hashtax & HashImpact - Unified SSL Issuer     "
 echo "=================================================="
@@ -20,13 +30,13 @@ cp -f conf.d/tools.conf conf.d/tools.http.conf.backup || true
 # or we've manually placed them there. The gateway needs to be up to serve /.well-known/acme-challenge.
 
 echo "--> Starting/Restarting Nginx gateway..."
-docker compose up -d nginx_gateway
+$COMPOSE_CMD up -d nginx_gateway
 sleep 3 # Wait for nginx to initialize
 
 # 3. Issue cert for HashImpact
 if [ ! -f "/etc/letsencrypt/live/hashimpact.io/fullchain.pem" ]; then
     echo "--> Requesting certificate for hashimpact.io and api.hashimpact.io..."
-    docker compose --profile certbot run --rm certbot certonly \
+    $COMPOSE_CMD --profile certbot run --rm certbot certonly \
       --webroot -w /var/www/certbot \
       -d hashimpact.io \
       -d api.hashimpact.io \
@@ -41,7 +51,7 @@ fi
 # 4. Issue cert for Tools
 if [ ! -f "/etc/letsencrypt/live/tools.hashtax.io/fullchain.pem" ]; then
     echo "--> Requesting certificate for tools.hashtax.io and tools-api.hashtax.io..."
-    docker compose --profile certbot run --rm certbot certonly \
+    $COMPOSE_CMD --profile certbot run --rm certbot certonly \
       --webroot -w /var/www/certbot \
       -d tools.hashtax.io \
       -d tools-api.hashtax.io \
@@ -61,7 +71,7 @@ echo "--> Activating HTTPS configs..."
 
 # 6. Reload Nginx
 echo "--> Reloading Nginx gateway..."
-docker compose exec -T nginx_gateway nginx -s reload
+$COMPOSE_CMD exec -T nginx_gateway nginx -s reload
 
 echo "=================================================="
 echo " ✅ SSL setup/check complete!"
