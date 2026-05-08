@@ -42,20 +42,6 @@ services:
     networks:
       - hashtax_network
 
-  ssl_issuer:
-    image: alpine:latest
-    container_name: ssl_issuer
-    depends_on:
-      - nginx_gateway
-    volumes:
-      - .:/app
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /usr/bin/docker:/usr/bin/docker
-    working_dir: /app
-    entrypoint: ["/bin/sh", "-c", "apk add --no-cache bash docker-cli && sleep 5 && bash issue_all_ssl.sh hello@hashtax.io"]
-    networks:
-      - hashtax_network
-
 networks:
   hashtax_network:
     external: true
