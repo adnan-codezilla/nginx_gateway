@@ -29,10 +29,8 @@ server {
   ssl_certificate     /etc/letsencrypt/live/tools.hashtax.io/fullchain.pem;
   ssl_certificate_key /etc/letsencrypt/live/tools.hashtax.io/privkey.pem;
 
-  ssl_session_cache   shared:SSL:10m;
-  ssl_session_timeout 1d;
-  ssl_protocols       TLSv1.2 TLSv1.3;
-  ssl_prefer_server_ciphers off;
+  include /etc/nginx/conf.d/ssl_params.conf;
+  include /etc/nginx/conf.d/security_headers.conf;
 
   location / {
     set $tools_frontend http://hashtax_frontend:3000;
@@ -53,10 +51,8 @@ server {
   ssl_certificate     /etc/letsencrypt/live/tools.hashtax.io/fullchain.pem;
   ssl_certificate_key /etc/letsencrypt/live/tools.hashtax.io/privkey.pem;
 
-  ssl_session_cache   shared:SSL:10m;
-  ssl_session_timeout 1d;
-  ssl_protocols       TLSv1.2 TLSv1.3;
-  ssl_prefer_server_ciphers off;
+  include /etc/nginx/conf.d/ssl_params.conf;
+  include /etc/nginx/conf.d/security_headers.conf;
 
   location / {
     set $tools_backend http://hashtax_backend:5000;
