@@ -50,11 +50,11 @@ fi
 
 # 4. Issue cert for Tools
 if [ ! -f "/etc/letsencrypt/live/tools.hashtax.io/fullchain.pem" ]; then
-    echo "--> Requesting certificate for tools.hashtax.io and tools-api.hashtax.io..."
     $COMPOSE_CMD --profile certbot run --rm certbot certonly \
       --webroot -w /var/www/certbot \
       -d tools.hashtax.io \
       -d tools-api.hashtax.io \
+      -d logs.hashtax.io \
       --email "${EMAIL}" \
       --agree-tos \
       --no-eff-email \

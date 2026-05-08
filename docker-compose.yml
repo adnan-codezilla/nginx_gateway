@@ -18,6 +18,18 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - hashtax_network
+    environment:
+      - DOZZLE_LEVEL=info
+      - DOZZLE_ADDR=:8888
+
 networks:
   hashtax_network:
     external: true
