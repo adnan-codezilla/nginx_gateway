@@ -24,10 +24,8 @@ docker network create hashtax_network >/dev/null 2>&1 || true
 echo "--> Setting HTTP-only configs for ACME challenge..."
 cp -f conf.d/hashimpact.conf conf.d/hashimpact.http.conf.backup || true
 cp -f conf.d/tools.conf conf.d/tools.http.conf.backup || true
-
-# In case we were stuck in a broken SSL state, overwrite with the safe templates we just created
-# We'll just assume conf.d/hashimpact.conf and conf.d/tools.conf are already in HTTP mode,
-# or we've manually placed them there. The gateway needs to be up to serve /.well-known/acme-challenge.
+cp -f conf.d/hashimpact.http.conf.disabled conf.d/hashimpact.conf
+cp -f conf.d/tools.http.conf.disabled conf.d/tools.conf
 
 echo "--> Starting/Restarting Nginx gateway..."
 $COMPOSE_CMD up -d nginx_gateway

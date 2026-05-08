@@ -57,5 +57,6 @@ Add this line at the bottom to run the renewal check every day at 3 AM:
 
 ## Config Architecture
 - `conf.d/hashimpact.conf` and `conf.d/tools.conf` are the active configs.
+- `conf.d/*.http.conf.disabled` are HTTP-only templates used for first-time ACME challenges.
 - `conf.d/*.ssl.conf.disabled` are the HTTPS templates that `issue_all_ssl.sh` automatically copies and activates.
 - `00-resolver.conf` helps Nginx dynamically resolve container IPs when containers restart.
