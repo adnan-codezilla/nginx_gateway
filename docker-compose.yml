@@ -30,6 +30,16 @@ services:
       - DOZZLE_LEVEL=info
       - DOZZLE_ADDR=:8888
 
+  certbot:
+    image: certbot/certbot:latest
+    profiles:
+      - certbot
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/www/certbot:/var/www/certbot
+    networks:
+      - hashtax_network
+
 networks:
   hashtax_network:
     external: true
