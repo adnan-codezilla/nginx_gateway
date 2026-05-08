@@ -33,12 +33,8 @@ server {
   include /etc/nginx/conf.d/security_headers.conf;
 
   location / {
-    set $tools_frontend http://hashtax_frontend:3000;
-    proxy_pass         $tools_frontend;
-    proxy_set_header   Host              $host;
-    proxy_set_header   X-Real-IP         $remote_addr;
-    proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
-    proxy_set_header   X-Forwarded-Proto $scheme;
+    proxy_pass         http://hashtax_frontend:3000;
+    include /etc/nginx/conf.d/proxy_params.conf;
   }
 }
 
@@ -55,9 +51,7 @@ server {
   include /etc/nginx/conf.d/security_headers.conf;
 
   location / {
-    set $tools_backend http://hashtax_backend:5000;
-    proxy_pass         $tools_backend;
-    proxy_set_header   Host              $host;
+    proxy_pass         http://hashtax_backend:5000;
     include /etc/nginx/conf.d/proxy_params.conf;
   }
 }
