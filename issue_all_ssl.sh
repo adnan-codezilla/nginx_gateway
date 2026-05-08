@@ -57,8 +57,8 @@ $COMPOSE_CMD --profile certbot run --rm certbot certonly \
 
 # 5. Activate SSL configs
 echo "--> Activating HTTPS configs..."
-[ -f "/etc/letsencrypt/live/hashimpact.io/fullchain.pem" ] && cp -f conf.d/hashimpact.ssl.conf.disabled conf.d/hashimpact.conf || echo "Skipping HashImpact SSL activation"
-[ -f "/etc/letsencrypt/live/tools.hashtax.io/fullchain.pem" ] && cp -f conf.d/tools.ssl.conf.disabled conf.d/tools.conf || echo "Skipping Tools SSL activation"
+cp -f conf.d/hashimpact.ssl.conf.disabled conf.d/hashimpact.conf
+cp -f conf.d/tools.ssl.conf.disabled conf.d/tools.conf
 
 # 6. Reload Nginx
 echo "--> Reloading Nginx gateway..."
