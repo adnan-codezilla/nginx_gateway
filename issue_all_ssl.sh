@@ -45,17 +45,15 @@ $COMPOSE_CMD --profile certbot run --rm certbot certonly \
   --non-interactive || echo "⚠️ HashImpact SSL issuance failed, skipping..."
 
 # 4. Issue cert for Tools
-echo "--> Requesting certificate for tools.hashtax.io, tools-api.hashtax.io and logs.hashtax.io..."
+echo "--> Requesting certificate for tools.hashtax.io and tools-api.hashtax.io..."
 $COMPOSE_CMD --profile certbot run --rm certbot certonly \
   --webroot -w /var/www/certbot \
   -d tools.hashtax.io \
   -d tools-api.hashtax.io \
-  -d logs.hashtax.io \
   --email "${EMAIL}" \
   --agree-tos \
   --no-eff-email \
-  --non-interactive \
-  --expand || echo "⚠️ Tools SSL issuance failed, skipping..."
+  --non-interactive || echo "⚠️ Tools SSL issuance failed, skipping..."
 
 # 5. Activate SSL configs
 echo "--> Activating HTTPS configs..."
