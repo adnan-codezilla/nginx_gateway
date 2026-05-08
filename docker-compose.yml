@@ -25,12 +25,12 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
-      - "8888:8888"
+      - "9999:9999"
     networks:
       - hashtax_network
     environment:
       - DOZZLE_LEVEL=info
-      - DOZZLE_ADDR=:8888
+      - DOZZLE_ADDR=:9999
 
   certbot:
     image: certbot/certbot:latest
