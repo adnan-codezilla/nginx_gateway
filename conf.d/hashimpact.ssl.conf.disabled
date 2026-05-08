@@ -1,0 +1,49 @@
+server {
+  listen 80;
+  server_name hashimpact.io api.hashimpact.io;
+
+  location /.well-known/acme-challenge/ {
+    root /var/www/certbot;
+  }
+
+  location / {
+    return 301 https://$host$request_uri;
+  }
+}
+
+server {
+  listen 443 ssl;
+  http2 on;
+  server_name hashimpact.io;
+
+  ssl_certificate     /etc/letsencrypt/live/hashimpact.io/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/hashimpact.io/privkey.pem;
+
+  location / {
+    set $hashimpact_frontend http://hashimpact_frontend:8081;
+    proxy_pass $hashimpact_frontend;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+}
+
+server {
+  listen 443 ssl;
+  http2 on;
+  server_name api.hashimpact.io;
+
+  ssl_certificate     /etc/letsencrypt/live/hashimpact.io/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/hashimpact.io/privkey.pem;
+
+  location / {
+    set $hashimpact_backend http://hashimpact_backend:8080;
+    proxy_pass $hashimpact_backend;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    client_max_body_size 20m;
+  }
+}
