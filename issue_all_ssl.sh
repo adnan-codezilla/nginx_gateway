@@ -29,10 +29,10 @@ activate_ssl_if_present() {
   local ssl_template="$2"
   local cert_dir="$3"
 
-  if [[ -f "${cert_dir}/fullchain.pem" && -f "${cert_dir}/privkey.pem" ]]; then
+  if $COMPOSE_CMD exec -T nginx_gateway sh -c "test -f '${cert_dir}/fullchain.pem' && test -f '${cert_dir}/privkey.pem'"; then
     cp -f "$ssl_template" "$active_conf"
   else
-    echo "⚠️  Missing certificate files in ${cert_dir}; keeping ${active_conf} on HTTP-only config."
+    echo "⚠️  Missing certificate files in nginx_gateway:${cert_dir}; keeping ${active_conf} on HTTP-only config."
     activate_http_only "$active_conf" "${ssl_template%.ssl.conf.disabled}.http.conf.disabled"
   fi
 }

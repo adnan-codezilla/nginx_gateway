@@ -1,19 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Detect docker compose version
 if docker compose version >/dev/null 2>&1; then
-    COMPOSE_CMD="docker compose"
+  COMPOSE_CMD="docker compose"
 elif docker-compose version >/dev/null 2>&1; then
-    COMPOSE_CMD="docker-compose"
+  COMPOSE_CMD="docker-compose"
 else
-    echo "❌ Error: Neither 'docker compose' nor 'docker-compose' found."
-    exit 1
+  echo "Error: Neither 'docker compose' nor 'docker-compose' found."
+  exit 1
 fi
 
-echo "=================================================="
-echo "    Hashtax & HashImpact - SSL Auto-Renewer       "
-echo "=================================================="
+docker network create hashtax_network >/dev/null 2>&1 || true
+$COMPOSE_CMD up -d nginx_gateway
 
 activate_ssl_if_present() {
   local active_conf="$1"
@@ -22,17 +20,11 @@ activate_ssl_if_present() {
 
   if $COMPOSE_CMD exec -T nginx_gateway sh -c "test -f '${cert_dir}/fullchain.pem' && test -f '${cert_dir}/privkey.pem'"; then
     cp -f "$ssl_template" "$active_conf"
+    echo "Activated ${active_conf} from ${ssl_template}."
   else
-    echo "⚠️ Missing certificate files in nginx_gateway:${cert_dir}; leaving ${active_conf} unchanged."
+    echo "Missing certificate files in nginx_gateway:${cert_dir}; ${active_conf} was not changed."
   fi
 }
-
-# Let certbot renew any certificates that are near expiry
-if ! $COMPOSE_CMD --profile certbot run --rm certbot renew \
-  --webroot -w /var/www/certbot \
-  --quiet; then
-  echo "⚠️ Certificate renewal reported an error."
-fi
 
 activate_ssl_if_present \
   conf.d/hashimpact.conf \
@@ -47,4 +39,4 @@ activate_ssl_if_present \
 $COMPOSE_CMD exec -T nginx_gateway nginx -t
 $COMPOSE_CMD exec -T nginx_gateway nginx -s reload
 
-echo "✅ Renewal check complete."
+echo "Nginx SSL activation complete."
