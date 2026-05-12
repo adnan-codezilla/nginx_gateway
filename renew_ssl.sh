@@ -16,11 +16,17 @@ echo "    Hashtax & HashImpact - SSL Auto-Renewer       "
 echo "=================================================="
 
 # Let certbot renew any certificates that are near expiry
-$COMPOSE_CMD --profile certbot run --rm certbot renew \
+if ! $COMPOSE_CMD --profile certbot run --rm certbot renew \
   --webroot -w /var/www/certbot \
-  --quiet
+  --quiet; then
+  echo "⚠️ Certificate renewal reported an error."
+fi
 
-# Reload Nginx to pick up any new certificates
-$COMPOSE_CMD exec -T nginx_gateway nginx -s reload
+if [[ -f /etc/letsencrypt/live/hashimpact.io/fullchain.pem && -f /etc/letsencrypt/live/tools.hashtax.io/fullchain.pem ]]; then
+  # Reload Nginx to pick up any new certificates
+  $COMPOSE_CMD exec -T nginx_gateway nginx -s reload
+else
+  echo "⚠️ One or more certificate files are missing; skipping nginx reload."
+fi
 
 echo "✅ Renewal check complete."

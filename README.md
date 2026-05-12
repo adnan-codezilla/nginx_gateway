@@ -23,10 +23,17 @@ docker compose up -d --build
 cd /home/ec2-user/projects/hash_tax/hashtax_be
 docker compose up -d --build
 
-cd /home/ec2-user/projects/hash_tax/HashImpact
-docker compose up -d --build
+cd /home/ec2-user/projects/hash_tax/HashImpact/website
+docker compose up -d --build frontend
+
+cd /home/ec2-user/projects/hash_tax/HashImpact/backend
+docker compose up -d --build backend
 ```
-*(Make sure `hashtax_be/.env` has `DB_HOST=hashtax_db` instead of 127.0.0.1)*
+
+HashImpact is split into service-owned compose files:
+- `HashImpact/website/docker-compose.yml` owns `hashimpact_frontend`.
+- `HashImpact/backend/docker-compose.yml` owns `hashimpact_backend`.
+- Both services must stay attached to the external `hashtax_network` and keep these aliases, because the gateway routes to `hashimpact_frontend:8081` and `hashimpact_backend:8080`.
 
 ## 3. Run Gateway & SSL Setup
 Go to this `nginx_gateway` folder:
