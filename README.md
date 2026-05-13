@@ -67,3 +67,5 @@ Add this line at the bottom to run the renewal check every day at 3 AM:
 - `conf.d/*.http.conf.disabled` are HTTP-only templates used for first-time ACME challenges.
 - `conf.d/*.ssl.conf.disabled` are the HTTPS templates that `issue_all_ssl.sh` automatically copies and activates.
 - `00-resolver.conf` helps Nginx dynamically resolve container IPs when containers restart.
+- `nginx.conf` contains the shared production defaults for logging, buffering, timeouts, and temp paths.
+- Docker images are pinned in `docker-compose.yml` so gateway upgrades are explicit instead of drifting with `latest`.
