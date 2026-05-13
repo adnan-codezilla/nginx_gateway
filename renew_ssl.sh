@@ -11,8 +11,6 @@ else
   exit 1
 fi
 
-docker network create hashtax_network >/dev/null 2>&1 || true
-
 echo "=================================================="
 echo "    Hashtax & HashImpact - SSL Auto-Renewer       "
 echo "=================================================="

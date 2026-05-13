@@ -1,34 +1,15 @@
 services:
   nginx_gateway:
-    image: nginx:1.27-alpine
+    image: nginx:latest
     container_name: nginx_gateway
-    restart: unless-stopped
-    init: true
+    restart: always
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./conf.d:/etc/nginx/conf.d:ro
+      - ./conf.d:/etc/nginx/conf.d
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - /var/www/certbot:/var/www/certbot
-    read_only: true
-    tmpfs:
-      - /var/cache/nginx
-      - /var/run
-      - /tmp
-    cap_drop:
-      - ALL
-    cap_add:
-      - NET_BIND_SERVICE
-    security_opt:
-      - no-new-privileges:true
-    healthcheck:
-      test: ["CMD-SHELL", "nginx -t >/dev/null 2>&1"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
     networks:
       - hashtax_network
     logging:
@@ -39,7 +20,7 @@ services:
 
 
   certbot:
-    image: certbot/certbot:v5.5.0
+    image: certbot/certbot:latest
     profiles:
       - certbot
     volumes:
@@ -50,4 +31,4 @@ services:
 
 networks:
   hashtax_network:
-    name: hashtax_network
+    external: true
