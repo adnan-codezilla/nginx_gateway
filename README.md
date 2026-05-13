@@ -17,16 +17,16 @@ docker network create hashtax_network
 ## 2. Run Apps
 Start the app containers from their respective folders:
 ```bash
-cd "$REMOTE_DIR/hashtax_tools_fe"
+cd "$REMOTE_BASE_DIR/hash_tax/hashtax_tools_fe"
 docker compose up -d --build
 
-cd "$REMOTE_DIR/hashtax_be"
+cd "$REMOTE_BASE_DIR/hash_tax/hashtax_be"
 docker compose up -d --build
 
-cd "$REMOTE_DIR/HashImpact/website"
+cd "$REMOTE_BASE_DIR/HashImpact/website"
 docker compose up -d --build frontend
 
-cd "$REMOTE_DIR/HashImpact/backend"
+cd "$REMOTE_BASE_DIR/HashImpact/backend"
 docker compose up -d --build backend
 ```
 
@@ -38,7 +38,7 @@ HashImpact is split into service-owned compose files:
 ## 3. Run Gateway & SSL Setup
 Go to this `nginx_gateway` folder:
 ```bash
-cd "$REMOTE_DIR/nginx_gateway"
+cd "$REMOTE_BASE_DIR/nginx_gateway"
 ```
 
 Run the automated script to issue all SSL certificates. This script will:
@@ -59,7 +59,7 @@ crontab -e
 ```
 Add this line at the bottom to run the renewal check every day at 3 AM:
 ```text
-0 3 * * * cd "$REMOTE_DIR/nginx_gateway" && bash renew_ssl.sh >> /var/log/ssl_renew.log 2>&1
+0 3 * * * cd "$REMOTE_BASE_DIR/nginx_gateway" && bash renew_ssl.sh >> /var/log/ssl_renew.log 2>&1
 ```
 
 ## Config Architecture
