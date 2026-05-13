@@ -50,4 +50,4 @@ services:
 
 networks:
   hashtax_network:
-    external: true
+    name: hashtax_network
