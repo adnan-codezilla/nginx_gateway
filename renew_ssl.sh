@@ -3,13 +3,15 @@ set -euo pipefail
 
 # Detect docker compose version
 if docker compose version >/dev/null 2>&1; then
-    COMPOSE_CMD="docker compose"
+  COMPOSE_CMD="docker compose"
 elif docker-compose version >/dev/null 2>&1; then
-    COMPOSE_CMD="docker-compose"
+  COMPOSE_CMD="docker-compose"
 else
-    echo "❌ Error: Neither 'docker compose' nor 'docker-compose' found."
-    exit 1
+  echo "❌ Error: Neither 'docker compose' nor 'docker-compose' found."
+  exit 1
 fi
+
+docker network create hashtax_network >/dev/null 2>&1 || true
 
 echo "=================================================="
 echo "    Hashtax & HashImpact - SSL Auto-Renewer       "

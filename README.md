@@ -13,6 +13,7 @@ Make sure the shared Docker network exists before starting any app:
 ```bash
 docker network create hashtax_network
 ```
+Most deploy scripts now create this automatically, but the manual command is still safe to run if you are setting things up by hand.
 
 ## 2. Run Apps
 Start the app containers from their respective folders:
